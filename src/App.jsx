@@ -1,5 +1,6 @@
-const { useState, useEffect, useRef, Fragment } = dc;
-const { h } = dc.preact;
+const { useState, useEffect, useRef } = dc;
+const { h, Fragment } = dc.preact;
+
 
 // Load subcomponents & helpers
 const { Crypto } = await dc.require(dc.resolvePath("KEYCHAIN BRIDGE/src/utils/CryptoUtils.js"));
