@@ -378,6 +378,13 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
         }
     };
 
+    const renderTooltip = (text) => {
+        return h('span', { className: 'tooltip-container', style: { marginLeft: '6px', verticalAlign: 'middle', display: 'inline-flex', opacity: 0.6 } },
+            h(dc.Icon, { icon: 'help-circle', style: { width: '13px', height: '13px' } }),
+            h('span', { className: 'tooltip-text' }, text)
+        );
+    };
+
     // Compact Mode View
     if (!isFullTab) {
         return h('div', { style: STYLES.compactWrapper, onClick: onToggleFullTab },
@@ -405,7 +412,7 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
         h('div', { style: STYLES.headerData },
             h('h1', { style: STYLES.title }, 'KEYCHAIN BRIDGE'),
             h('div', { style: { display: 'flex', alignItems: 'center', gap: '16px', marginTop: '6px' } },
-                h('div', { style: STYLES.subtitle }, 'Obsidian Native OS Keyring & Encrypted Vault backups'),
+                h('div', { style: STYLES.subtitle }, 'Unified Local OS Keyring & Encrypted backups'),
                 h('div', { style: STYLES.badge(statusText) }, statusText)
             )
         ),
@@ -414,7 +421,7 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
         (mode === 'LOCKED' || mode === 'SETUP') && h('div', { style: { display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' } },
             h('div', { style: { ...STYLES.glassCard, width: '400px', padding: '24px', gap: '16px', flex: 'none', justifyContent: 'center' } },
                 h('h3', { style: { margin: 0, textAlign: 'center', color: '#fff', fontSize: '15px', fontWeight: 'bold' } }, 
-                    mode === 'SETUP' ? 'KEYRING BRIDGE CONFIGURATION' : 'BRIDGE KEY DECRYPT REQUIRED'
+                    mode === 'SETUP' ? 'KEYRING BRIDGE CONFIGURATION' : 'ENTER MASTER PASSPHRASE'
                 ),
                 h('p', { style: { margin: 0, fontSize: '11px', color: THEME.foregroundMuted, textAlign: 'center', lineHeight: '1.4' } },
                     mode === 'SETUP' 
@@ -456,7 +463,7 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
                 h('div', null,
                     h('div', { style: { color: '#f87171', fontWeight: 'bold', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' } },
                         h(dc.Icon, { icon: 'alert-triangle', style: { width: 14 } }),
-                        'SECURITY THREAT: PLAIN-TEXT LOCALSTORAGE LEAKS'
+                        'SECURITY LEAK DETECTED'
                     ),
                     h('div', { style: { fontSize: '11px', color: THEME.foregroundMuted, marginTop: '2px' } }, 
                         `${leakedKeys.length} sensitive item(s) found in plain-text storage. A single click will move them to your OS keychain.`
@@ -471,28 +478,34 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
                 h('div', { style: { display: 'flex', flexDirection: 'column', gap: '20px', minHeight: 0 } },
                     h('div', { style: STYLES.glassCard },
                         h('div', { style: STYLES.cardHeader },
-                            h('span', { style: STYLES.cardLabel }, 'Keychain Bridge Commands')
+                            h('span', { style: STYLES.cardLabel }, 
+                                'Backup & Restore',
+                                renderTooltip("Operations to sync your credentials between this computer and your local vault backup.")
+                            )
                         ),
-                        h('button', { style: STYLES.buttonPrimary(isBusy), disabled: isBusy, onClick: handleBackup }, 'Backup System Keyring to Vault'),
+                        h('button', { style: STYLES.buttonPrimary(isBusy), disabled: isBusy, onClick: handleBackup }, 'Backup Keys to Vault'),
                         h('button', { 
                             style: { ...STYLES.buttonSecondary, marginTop: '4px', width: '100%', padding: '10px' }, 
                             disabled: isBusy || Object.keys(backupPayload).length === 0, 
                             onClick: handleRestore 
-                        }, 'Redeploy Backup Secrets to Computer'),
+                        }, 'Restore Keys to Computer'),
                         
                         h('div', { style: { borderTop: `1px solid ${THEME.border}`, paddingTop: '12px', marginTop: '10px' } },
-                            h('div', { style: { color: THEME.foregroundMuted, fontSize: '10px', fontWeight: 'bold', marginBottom: '8px' } }, 'ADD SECRET RECORD'),
+                            h('div', { style: { color: THEME.foregroundMuted, fontSize: '10px', fontWeight: 'bold', marginBottom: '8px' } }, 
+                                'ADD KEY TO COMPUTER',
+                                renderTooltip("Saves a new secret credential directly to your computer's secure OS keychain.")
+                            ),
                             h('div', { style: STYLES.inputGroup },
                                 h('input', {
                                     style: STYLES.input,
-                                    placeholder: 'Key Identity (e.g. openai-token)',
+                                    placeholder: 'Identifier / Name (e.g. openai-key)',
                                     value: newKeyName,
                                     onChange: e => setNewKeyName(e.target.value)
                                 }),
                                 h('input', {
                                     style: STYLES.input,
                                     type: 'password',
-                                    placeholder: 'Secret Plaintext Value',
+                                    placeholder: 'Secret Value (Token/Password)',
                                     value: newKeyValue,
                                     onChange: e => setNewKeyValue(e.target.value)
                                 }),
@@ -500,7 +513,7 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
                                     style: STYLES.buttonPrimary(!newKeyName || !newKeyValue || isBusy), 
                                     disabled: !newKeyName || !newKeyValue || isBusy, 
                                     onClick: handleCreateSecret 
-                                }, 'Seal Record to OS Keychain')
+                                }, 'Save Secret to Computer')
                             )
                         )
                     )
@@ -509,8 +522,14 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
                 // Column 2: Computer Keys & Backup Snapshot Explorer
                 h('div', { style: STYLES.glassCard },
                     h('div', { style: { display: 'flex', gap: '5px', padding: '4px', background: THEME.backgroundAlt2, borderRadius: '6px', flexShrink: 0 } },
-                        h('button', { style: STYLES.tabBtn(registryTab === 'SYSTEM'), onClick: () => setRegistryTab('SYSTEM') }, 'COMPUTER KEYCHAIN'),
-                        h('button', { style: STYLES.tabBtn(registryTab === 'BACKUP'), onClick: () => setRegistryTab('BACKUP') }, 'BACKUP SNAPSHOT')
+                        h('button', { style: STYLES.tabBtn(registryTab === 'SYSTEM'), onClick: () => setRegistryTab('SYSTEM') }, 
+                            'ON COMPUTER',
+                            renderTooltip("Credentials currently stored securely in your OS Keychain.")
+                        ),
+                        h('button', { style: STYLES.tabBtn(registryTab === 'BACKUP'), onClick: () => setRegistryTab('BACKUP') }, 
+                            'IN BACKUP FILE',
+                            renderTooltip("Credentials stored in your encrypted backup snapshot file.")
+                        )
                     ),
 
                     registryTab === 'BACKUP' && snapshots.length > 0 && h('div', { style: { padding: '8px 10px', background: THEME.backgroundAlt2, borderRadius: '4px', display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 } },
@@ -574,7 +593,10 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
                 // Column 3: History log and audit
                 h('div', { style: STYLES.glassCard },
                     h('div', { style: STYLES.cardHeader },
-                        h('span', { style: STYLES.cardLabel }, 'Activity Audit Trail'),
+                        h('span', { style: STYLES.cardLabel }, 
+                            'Bridge Activity Log',
+                            renderTooltip("Audited trail of keychain actions, unlocks, backups, and restores.")
+                        ),
                         h('button', { 
                             style: { background: 'none', border: 'none', color: THEME.foregroundMuted, cursor: 'pointer', fontSize: '9px' },
                             onClick: () => {

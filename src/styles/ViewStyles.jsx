@@ -242,6 +242,39 @@ function getStyles() {
                 margin-bottom: 6px;
                 border-bottom: 1px dashed var(--border-color);
             }
+            .tooltip-container {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                cursor: pointer;
+            }
+            .tooltip-text {
+                visibility: hidden;
+                width: 220px;
+                background-color: var(--background-secondary-alt);
+                color: var(--text-normal);
+                text-align: left;
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                padding: 8px 12px;
+                position: absolute;
+                z-index: 9999;
+                bottom: 125%;
+                left: 50%;
+                transform: translateX(-50%);
+                opacity: 0;
+                transition: opacity 0.25s, visibility 0.25s;
+                font-size: 11px;
+                font-weight: normal;
+                line-height: 1.4;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                pointer-events: none;
+                white-space: normal;
+            }
+            .tooltip-container:hover .tooltip-text {
+                visibility: visible;
+                opacity: 1;
+            }
         `
     };
 
