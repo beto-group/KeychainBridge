@@ -7,3 +7,18 @@ data/bridge-history.json
 data/archives/
 node_modules/
 dist/
+
+# Cache
+.cache/
+*.cache
+.eslintcache
+.parcel-cache
+
+# Passwords, keys, and hashes
+*.hash
+*.password
+*.passwd
+*.key
+.env
+.envc
+.secrets
