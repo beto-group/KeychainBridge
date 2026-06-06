@@ -485,12 +485,12 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
                                 renderTooltip("Operations to sync your credentials between this computer and your local vault backup.")
                             )
                         ),
-                        h('button', { style: STYLES.buttonPrimary(isBusy), disabled: isBusy, onClick: handleBackup }, 'Backup Keys to Vault'),
+                        h('button', { style: STYLES.buttonPrimary(isBusy), disabled: isBusy, onClick: handleBackup }, 'Export Computer Keys to Backup (.enc)'),
                         h('button', { 
                             style: { ...STYLES.buttonSecondary, marginTop: '4px', width: '100%', padding: '10px' }, 
                             disabled: isBusy || Object.keys(backupPayload).length === 0, 
                             onClick: handleRestore 
-                        }, 'Restore Keys to Computer'),
+                        }, 'Import Backup (.enc) to Computer'),
                         
                         h('div', { style: { borderTop: `1px solid ${THEME.border}`, paddingTop: '12px', marginTop: '10px' } },
                             h('div', { style: { color: THEME.foregroundMuted, fontSize: '10px', fontWeight: 'bold', marginBottom: '8px' } }, 
