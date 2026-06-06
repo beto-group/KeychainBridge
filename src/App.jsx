@@ -562,7 +562,7 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
                                 ),
                                 h('div', { style: { display: 'flex', gap: '8px', flexShrink: 0 } },
                                     h('button', { 
-                                        style: STYLES.iconButton, 
+                                        className: 'keychain-bridge-action-btn',
                                         onClick: () => {
                                             if (revealedSecret?.id === k) {
                                                 setRevealedSecret(null);
@@ -578,7 +578,7 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
                                         h(dc.Icon, { icon: revealedSecret?.id === k ? 'eye-off' : 'eye', style: { width: 14 } })
                                     ),
                                     h('button', { 
-                                        style: { ...STYLES.iconButton, color: THEME.red }, 
+                                        className: 'keychain-bridge-delete-btn',
                                         onClick: () => registryTab === 'SYSTEM' ? handleDeleteSystem(k) : handleDeleteBackup(k) 
                                     },
                                         h(dc.Icon, { icon: 'trash-2', style: { width: 14 } })
