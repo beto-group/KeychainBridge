@@ -379,9 +379,11 @@ function KeychainBridgeApp({ folderPath, onCodeReloadRequest, isFullTab, onToggl
     };
 
     const renderTooltip = (text) => {
-        return h('span', { className: 'tooltip-container', style: { marginLeft: '6px', verticalAlign: 'middle', display: 'inline-flex', opacity: 0.6 } },
-            h(dc.Icon, { icon: 'help-circle', style: { width: '13px', height: '13px' } }),
-            h('span', { className: 'tooltip-text' }, text)
+        return h('span', { 
+            style: { marginLeft: '6px', verticalAlign: 'middle', display: 'inline-flex', opacity: 0.6, cursor: 'help' },
+            title: text
+        },
+            h(dc.Icon, { icon: 'help-circle', style: { width: '13px', height: '13px' } })
         );
     };
 
