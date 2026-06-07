@@ -19,7 +19,7 @@
   <hr>
 </div>
 
-![Keychain Bridge Walkthrough](assets/keychainbridge.clip.webm)
+<img src="assets/keychainbridge.clip.gif" alt="Keychain Bridge Walkthrough" width="100%">
 
 <div align="center">
   <p>
