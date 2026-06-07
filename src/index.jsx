@@ -114,32 +114,41 @@ async function View({ folderPath }) {
                 stateRefs.placeholder.className = "screen-mode-placeholder";
                 stateRefs.placeholder.style.display = 'none';
                 container.parentNode.insertBefore(stateRefs.placeholder, container);
+
+                contentWrapper.appendChild(container);
                 
-                const computedParentPosition = window.getComputedStyle(contentWrapper).position;
                 stateRefs.parentPositionInfo = {
                     element: contentWrapper,
                     originalInlinePosition: contentWrapper.style.position
                 };
-                if (computedParentPosition === 'static') {
+                if (window.getComputedStyle(contentWrapper).position === 'static') {
                     contentWrapper.style.position = "relative";
                 }
+
+                Object.assign(contentWrapper.style, {
+                    padding: "0",
+                    margin: "0",
+                    height: "100%",
+                    width: "100%",
+                    display: "block",
+                    overflow: "hidden"
+                });
                 
-                contentWrapper.appendChild(container);
                 Object.assign(container.style, {
                     position: "absolute", top: "0px", left: "0px",
                     width: "100%", height: "100%", zIndex: "9998",
-                    overflow: "auto"
+                    overflow: "hidden"
                 });
 
-                // Hide Obsidian's view metadata / status bar UI elements
+                // Hide Obsidian's view metadata / status bar UI elements (preserving headers)
                 const styleId = `full-tab-styles-${uniqueWrapperClass}`;
                 let styleEl = document.getElementById(styleId);
                 if (!styleEl) {
                     styleEl = document.createElement('style');
                     styleEl.id = styleId;
                     styleEl.innerHTML = `
-                        .status-bar, .view-header, .inline-title, .view-footer { display: none !important; }
-                        .workspace-leaf-content { padding: 0 !important; margin: 0 !important; border-radius: 0 !important; overflow: hidden !important; }
+                        .status-bar, .view-footer, .workspace-leaf-content-footer { display: none !important; }
+                        .workspace-leaf-content { padding: 0 !important; margin: 0 !important; border-radius: 0 !important; }
                     `;
                     document.head.appendChild(styleEl);
                 }
@@ -157,7 +166,13 @@ async function View({ folderPath }) {
                     stateRefs.originalParent.appendChild(container);
                 }
                 if (stateRefs.parentPositionInfo?.element) {
-                    stateRefs.parentPositionInfo.element.style.position = stateRefs.parentPositionInfo.originalInlinePosition || '';
+                    const { element, originalInlinePosition } = stateRefs.parentPositionInfo;
+                    element.style.position = originalInlinePosition || '';
+                    element.style.padding = '';
+                    element.style.margin = '';
+                    element.style.height = '';
+                    element.style.width = '';
+                    element.style.overflow = '';
                 }
                 container.removeAttribute("style");
                 Object.keys(stateRefs).forEach(key => stateRefs[key] = null);
