@@ -1,6 +1,6 @@
 const l = {
   deriveKey: async (s, e) => {
-    const t = new TextEncoder(), r = await window.crypto.subtle.importKey(
+    const t = new TextEncoder(), r = typeof e == "string" ? t.encode(e) : e, a = await window.crypto.subtle.importKey(
       "raw",
       t.encode(s),
       { name: "PBKDF2" },
@@ -10,50 +10,47 @@ const l = {
     return window.crypto.subtle.deriveKey(
       {
         name: "PBKDF2",
-        salt: t.encode(e),
+        salt: r,
         iterations: 1e5,
         hash: "SHA-256"
       },
-      r,
+      a,
       { name: "AES-GCM", length: 256 },
       !0,
       ["encrypt", "decrypt"]
     );
   },
   encrypt: async (s, e) => {
-    const t = await l.deriveKey(e, "datacore_salt_static"), r = window.crypto.getRandomValues(new Uint8Array(12)), c = new TextEncoder(), n = await window.crypto.subtle.encrypt(
-      { name: "AES-GCM", iv: r },
-      t,
-      c.encode(JSON.stringify(s))
-    ), a = new Uint8Array(n), o = new Uint8Array(r.length + a.length);
-    return o.set(r), o.set(a, r.length), btoa(String.fromCharCode.apply(null, o));
+    const t = window.crypto.getRandomValues(new Uint8Array(16)), r = window.crypto.getRandomValues(new Uint8Array(12)), a = await l.deriveKey(e, t), n = new TextEncoder().encode(JSON.stringify(s)), c = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: r }, a, n), i = new Uint8Array(t.length + r.length + c.byteLength);
+    return i.set(t, 0), i.set(r, t.length), i.set(new Uint8Array(c), t.length + r.length), btoa(String.fromCharCode.apply(null, i));
   },
   decrypt: async (s, e) => {
-    const t = await l.deriveKey(e, "datacore_salt_static"), r = new Uint8Array(atob(s).split("").map((d) => d.charCodeAt(0))), c = r.slice(0, 12), n = r.slice(12), a = await window.crypto.subtle.decrypt(
-      { name: "AES-GCM", iv: c },
-      t,
-      n
-    ), o = new TextDecoder();
-    return JSON.parse(o.decode(a));
+    try {
+      const t = new Uint8Array(atob(s).split("").map((w) => w.charCodeAt(0))), r = t.slice(0, 16), a = t.slice(16, 28), n = t.slice(28), c = await l.deriveKey(e, r), i = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: a }, c, n);
+      return JSON.parse(new TextDecoder().decode(i));
+    } catch {
+      throw new Error("Incorrect Password.");
+    }
   },
+  // Used by WebFallbackProvider for encrypting localized strings using an already-derived key
   encryptString: async (s, e) => {
-    const t = window.crypto.getRandomValues(new Uint8Array(12)), r = new TextEncoder(), c = await window.crypto.subtle.encrypt(
+    const t = window.crypto.getRandomValues(new Uint8Array(12)), r = new TextEncoder(), a = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: t },
       e,
       r.encode(s)
-    ), n = new Uint8Array(c), a = new Uint8Array(t.length + n.length);
-    return a.set(t), a.set(n, t.length), btoa(String.fromCharCode.apply(null, a));
+    ), n = new Uint8Array(a), c = new Uint8Array(t.length + n.length);
+    return c.set(t), c.set(n, t.length), btoa(String.fromCharCode.apply(null, c));
   },
   decryptString: async (s, e) => {
-    const t = new Uint8Array(atob(s).split("").map((o) => o.charCodeAt(0))), r = t.slice(0, 12), c = t.slice(12), n = await window.crypto.subtle.decrypt(
+    const t = new Uint8Array(atob(s).split("").map((i) => i.charCodeAt(0))), r = t.slice(0, 12), a = t.slice(12), n = await window.crypto.subtle.decrypt(
       { name: "AES-GCM", iv: r },
       e,
-      c
+      a
     );
     return new TextDecoder().decode(n);
   }
 };
-class w {
+class d {
   constructor(e) {
     var t;
     this.secretStorage = ((t = e == null ? void 0 : e.app) == null ? void 0 : t.secretStorage) || window.app && window.app.secretStorage;
@@ -123,7 +120,7 @@ class g {
       }
   }
 }
-class S {
+class h {
   constructor() {
     this.masterKey = null, this.storageKey = "datacore_web_vault";
   }
@@ -165,15 +162,15 @@ class S {
   }
 }
 var y;
-const h = typeof dc < "u" && ((y = dc == null ? void 0 : dc.app) == null ? void 0 : y.secretStorage);
-let i = null;
-u ? i = new g() : h ? i = new w(typeof dc < "u" ? dc : window) : i = new S();
+const S = typeof dc < "u" && ((y = dc == null ? void 0 : dc.app) == null ? void 0 : y.secretStorage);
+let o = null;
+u ? o = new g() : S ? o = new d(typeof dc < "u" ? dc : window) : o = new h();
 const p = {
-  provider: i,
-  list: async () => await i.listSecrets(),
-  get: async (s) => await i.getSecret(s),
-  set: async (s, e) => await i.setSecret(s, e),
-  delete: async (s) => await i.deleteSecret(s)
+  provider: o,
+  list: async () => await o.listSecrets(),
+  get: async (s) => await o.getSecret(s),
+  set: async (s, e) => await o.setSecret(s, e),
+  delete: async (s) => await o.deleteSecret(s)
 };
 export {
   p as Storage
