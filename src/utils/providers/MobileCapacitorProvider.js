@@ -1,4 +1,4 @@
-import { KeychainProvider } from "./KeychainProvider.js";
+const { KeychainProvider } = dc.require("./providers/KeychainProvider.js");
 
 // Attempt to load Capacitor Secure Storage if available in the host environment
 let SecureStoragePlugin = null;
@@ -10,7 +10,7 @@ try {
     // Will be null if not running in Capacitor environment
 }
 
-export class MobileCapacitorProvider extends KeychainProvider {
+class MobileCapacitorProvider extends KeychainProvider {
     constructor() {
         super();
         this.prefix = "datacore_keychain_";
@@ -56,3 +56,5 @@ export class MobileCapacitorProvider extends KeychainProvider {
         }
     }
 }
+
+return { MobileCapacitorProvider };

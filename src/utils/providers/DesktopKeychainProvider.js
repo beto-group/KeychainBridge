@@ -1,6 +1,6 @@
-import { KeychainProvider } from "./KeychainProvider.js";
+const { KeychainProvider } = dc.require("./providers/KeychainProvider.js");
 
-export class DesktopKeychainProvider extends KeychainProvider {
+class DesktopKeychainProvider extends KeychainProvider {
     constructor(dc) {
         super();
         this.secretStorage = dc?.app?.secretStorage || (window.app && window.app.secretStorage);
@@ -42,3 +42,5 @@ export class DesktopKeychainProvider extends KeychainProvider {
         }
     }
 }
+
+return { DesktopKeychainProvider };

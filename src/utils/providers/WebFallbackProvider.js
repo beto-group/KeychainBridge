@@ -1,11 +1,11 @@
-import { KeychainProvider } from "./KeychainProvider.js";
-import { CryptoUtils } from "../CryptoUtils.js";
+const { KeychainProvider } = dc.require("./providers/KeychainProvider.js");
+const { CryptoUtils } = dc.require("../CryptoUtils.js");
 
 /**
  * WebFallbackProvider uses WebCrypto API to encrypt secrets and stores them in localStorage.
  * Requires a user-provided Master Password to unlock the vault.
  */
-export class WebFallbackProvider extends KeychainProvider {
+class WebFallbackProvider extends KeychainProvider {
     constructor() {
         super();
         this.masterKey = null; // AES-GCM CryptoKey
@@ -64,3 +64,5 @@ export class WebFallbackProvider extends KeychainProvider {
         this._saveVault(vault);
     }
 }
+
+return { WebFallbackProvider };

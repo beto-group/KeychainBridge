@@ -1,6 +1,6 @@
-import { DesktopKeychainProvider } from "./providers/DesktopKeychainProvider.js";
-import { MobileCapacitorProvider } from "./providers/MobileCapacitorProvider.js";
-import { WebFallbackProvider } from "./providers/WebFallbackProvider.js";
+const { DesktopKeychainProvider } = dc.require("./providers/DesktopKeychainProvider.js");
+const { MobileCapacitorProvider } = dc.require("./providers/MobileCapacitorProvider.js");
+const { WebFallbackProvider } = dc.require("./providers/WebFallbackProvider.js");
 
 // Determine the environment
 const isMobile = window.Capacitor && window.Capacitor.isNative;
@@ -46,4 +46,4 @@ const Storage = {
     }
 };
 
-export { Storage };
+return { Storage };
