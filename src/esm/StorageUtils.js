@@ -1,4 +1,4 @@
-const { Crypto } = dc.require(dc.resolvePath("KEYCHAIN BRIDGE/src/utils/CryptoUtils.js"));
+import { Crypto } from "./CryptoUtils.js";
 
 // --- Providers Inline ---
 
@@ -176,4 +176,4 @@ const Storage = {
     delete: async (id) => await activeProvider.deleteSecret(id)
 };
 
-return { Storage };
+export { Storage  };

@@ -4,7 +4,7 @@
   "type": "module",
   "main": "dist/keychain-bridge.es.js",
   "scripts": {
-    "build": "vite build"
+    "build": "node scripts/build-esm.mjs && vite build"
   },
   "devDependencies": {
     "vite": "^5.2.0"

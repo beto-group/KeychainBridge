@@ -4,7 +4,7 @@ import path from 'path';
 export default defineConfig({
   build: {
     lib: {
-      entry: 'src/utils/StorageUtils.js',
+      entry: 'src/esm/StorageUtils.js',
       name: 'KeychainBridge',
       formats: ['es'],
       fileName: (format) => `keychain-bridge.${format}.js`

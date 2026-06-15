@@ -81,4 +81,4 @@ const Crypto = {
     }
 };
 
-return { Crypto };
+export { Crypto  };
