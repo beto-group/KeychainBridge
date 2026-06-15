@@ -1,3 +1,5 @@
+const dc = window.dc || window.datacore;
+
 function ControlsMenu({ onReload, onToggle, styles, isFullTab }) {
     const theme = styles.theme;
     

@@ -57,19 +57,51 @@ async function View({ folderPath }) {
             return stopAgent;
         }, []);
 
-        // Load files
+        // Load ESM Bundle
         dc.useEffect(() => {
+            let active = true;
+            let cleanup = null;
+
             const load = async () => {
                 try {
-                    const { KeychainBridge } = await dc.require(folderPath + '/src/App.jsx');
-                    setApp({ KeychainBridge });
+                    // Inject global context bridge for the ESM bundle
+                    window.dc = dc;
+
+                    // Resolve the bundle path within the Obsidian vault
+                    const file = dc.app.vault.getAbstractFileByPath(`${folderPath}/dist/keychain-bridge.es.js`);
+                    if (!file) throw new Error("Could not find dist/keychain-bridge.es.js in vault. Please run npm run build.");
+                    
+                    const url = dc.app.vault.getResourcePath(file);
+                    
+                    // Dynamically import the compiled module
+                    const module = await import(url);
+                    if (!active) return;
+
+                    // Execute the native Sovereign Inspector WASM/ESM entrypoint
+                    const instanceCleanup = await module.mount_app(containerRef.current, dc, {
+                        folderPath: folderPath,
+                        isFullTab: isFullTab,
+                        onCodeReloadRequest: () => setKey(k => k + 1),
+                        onToggleFullTab: () => setIsFullTab(!isFullTab)
+                    });
+                    if (!active) {
+                        if (instanceCleanup) instanceCleanup();
+                        return;
+                    }
+                    cleanup = instanceCleanup;
+                    setApp(true);
                     setError(null);
                 } catch (e) {
                     console.error("Critical Load Error:", e);
-                    setError(e);
+                    if (active) setError(e);
                 }
             };
             load();
+
+            return () => {
+                active = false;
+                if (cleanup) cleanup();
+            };
         }, [key]);
 
         // Helpers for portal reparenting
@@ -197,24 +229,15 @@ async function View({ folderPath }) {
                 <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                         <span style={{ animation: 'spin 1s linear infinite' }}>⏳</span>
-                        Loading Keychain Bridge...
+                        Loading Universal Keychain Bridge...
                     </div>
                     <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
                 </div>
             );
         }
 
-        const { KeychainBridge } = app;
         return (
-            <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-                <KeychainBridge 
-                    key={key} 
-                    folderPath={folderPath} 
-                    onCodeReloadRequest={() => setKey(k => k + 1)}
-                    isFullTab={isFullTab}
-                    onToggleFullTab={() => setIsFullTab(!isFullTab)}
-                />
-            </div>
+            <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
         );
     };
 

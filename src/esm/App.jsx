@@ -1,3 +1,5 @@
+const dc = window.dc || window.datacore;
+
 const { useState, useEffect, useRef } = dc;
 const { h, Fragment } = dc.preact;
 

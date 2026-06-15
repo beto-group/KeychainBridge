@@ -1,3 +1,5 @@
+const dc = window.dc || window.datacore;
+
 function getStyles() {
     // Standard Obsidian CSS Variables for maximum flexibility
     const theme = {

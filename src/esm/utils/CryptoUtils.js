@@ -1,3 +1,5 @@
+const dc = window.dc || window.datacore;
+
 const Crypto = {
     deriveKey: async (passphrase, salt) => {
         const enc = new TextEncoder();

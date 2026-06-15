@@ -1,6 +1,6 @@
-const C = {
+const T = {
   deriveKey: async (n, a) => {
-    const r = new TextEncoder(), s = typeof a == "string" ? r.encode(a) : a, p = await window.crypto.subtle.importKey(
+    const r = new TextEncoder(), i = typeof a == "string" ? r.encode(a) : a, d = await window.crypto.subtle.importKey(
       "raw",
       r.encode(n),
       { name: "PBKDF2" },
@@ -10,23 +10,23 @@ const C = {
     return window.crypto.subtle.deriveKey(
       {
         name: "PBKDF2",
-        salt: s,
+        salt: i,
         iterations: 1e5,
         hash: "SHA-256"
       },
-      p,
+      d,
       { name: "AES-GCM", length: 256 },
       !0,
       ["encrypt", "decrypt"]
     );
   },
   encrypt: async (n, a) => {
-    const r = window.crypto.getRandomValues(new Uint8Array(16)), s = window.crypto.getRandomValues(new Uint8Array(12)), p = await C.deriveKey(a, r), i = new TextEncoder().encode(JSON.stringify(n)), o = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: s }, p, i), x = new Uint8Array(r.length + s.length + o.byteLength);
-    return x.set(r, 0), x.set(s, r.length), x.set(new Uint8Array(o), r.length + s.length), btoa(String.fromCharCode.apply(null, x));
+    const r = window.crypto.getRandomValues(new Uint8Array(16)), i = window.crypto.getRandomValues(new Uint8Array(12)), d = await T.deriveKey(a, r), s = new TextEncoder().encode(JSON.stringify(n)), o = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: i }, d, s), x = new Uint8Array(r.length + i.length + o.byteLength);
+    return x.set(r, 0), x.set(i, r.length), x.set(new Uint8Array(o), r.length + i.length), btoa(String.fromCharCode.apply(null, x));
   },
   decrypt: async (n, a) => {
     try {
-      const r = new Uint8Array(atob(n).split("").map((d) => d.charCodeAt(0))), s = r.slice(0, 16), p = r.slice(16, 28), i = r.slice(28), o = await C.deriveKey(a, s), x = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: p }, o, i);
+      const r = new Uint8Array(atob(n).split("").map((p) => p.charCodeAt(0))), i = r.slice(0, 16), d = r.slice(16, 28), s = r.slice(28), o = await T.deriveKey(a, i), x = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: d }, o, s);
       return JSON.parse(new TextDecoder().decode(x));
     } catch {
       throw new Error("Incorrect Password.");
@@ -34,23 +34,23 @@ const C = {
   },
   // Used by WebFallbackProvider for encrypting localized strings using an already-derived key
   encryptString: async (n, a) => {
-    const r = window.crypto.getRandomValues(new Uint8Array(12)), s = new TextEncoder(), p = await window.crypto.subtle.encrypt(
+    const r = window.crypto.getRandomValues(new Uint8Array(12)), i = new TextEncoder(), d = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: r },
       a,
-      s.encode(n)
-    ), i = new Uint8Array(p), o = new Uint8Array(r.length + i.length);
-    return o.set(r), o.set(i, r.length), btoa(String.fromCharCode.apply(null, o));
+      i.encode(n)
+    ), s = new Uint8Array(d), o = new Uint8Array(r.length + s.length);
+    return o.set(r), o.set(s, r.length), btoa(String.fromCharCode.apply(null, o));
   },
   decryptString: async (n, a) => {
-    const r = new Uint8Array(atob(n).split("").map((x) => x.charCodeAt(0))), s = r.slice(0, 12), p = r.slice(12), i = await window.crypto.subtle.decrypt(
-      { name: "AES-GCM", iv: s },
+    const r = new Uint8Array(atob(n).split("").map((x) => x.charCodeAt(0))), i = r.slice(0, 12), d = r.slice(12), s = await window.crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: i },
       a,
-      p
+      d
     );
-    return new TextDecoder().decode(i);
+    return new TextDecoder().decode(s);
   }
-};
-class De {
+}, z = window.dc || window.datacore;
+class Be {
   constructor(a) {
     var r;
     this.secretStorage = ((r = a == null ? void 0 : a.app) == null ? void 0 : r.secretStorage) || window.app && window.app.secretStorage;
@@ -69,13 +69,13 @@ class De {
     this.secretStorage && (typeof this.secretStorage.deleteSecret == "function" ? await this.secretStorage.deleteSecret(a) : this.secretStorage.secrets && (delete this.secretStorage.secrets[a], this.secretStorage.saveSecrets ? await this.secretStorage.saveSecrets() : this.secretStorage.save && await this.secretStorage.save()));
   }
 }
-const ye = typeof window < "u" && window.Capacitor && window.Capacitor.isNative;
-class Pe {
+const he = typeof window < "u" && window.Capacitor && window.Capacitor.isNative;
+class Oe {
   constructor() {
     this.prefix = "datacore_keychain_";
   }
   async _getPlugin() {
-    if (ye)
+    if (he)
       try {
         return (await import("capacitor-secure-storage-plugin")).SecureStoragePlugin;
       } catch {
@@ -88,7 +88,7 @@ class Pe {
     if (!a) return [];
     try {
       const { keys: r } = await a.keys();
-      return r.filter((s) => s.startsWith(this.prefix)).map((s) => s.replace(this.prefix, ""));
+      return r.filter((i) => i.startsWith(this.prefix)).map((i) => i.replace(this.prefix, ""));
     } catch {
       return [];
     }
@@ -97,17 +97,17 @@ class Pe {
     const r = await this._getPlugin();
     if (!r) return null;
     try {
-      const { value: s } = await r.get({ key: this.prefix + a });
-      return s;
+      const { value: i } = await r.get({ key: this.prefix + a });
+      return i;
     } catch {
       return null;
     }
   }
   async setSecret(a, r) {
-    const s = await this._getPlugin();
-    if (s)
+    const i = await this._getPlugin();
+    if (i)
       try {
-        await s.set({ key: this.prefix + a, value: r });
+        await i.set({ key: this.prefix + a, value: r });
       } catch {
       }
   }
@@ -120,12 +120,12 @@ class Pe {
       }
   }
 }
-class Me {
+class ze {
   constructor() {
     this.masterKey = null, this.storageKey = "datacore_web_vault";
   }
   async unlock(a) {
-    this.masterKey = await C.deriveKey(a, "datacore_salt_static");
+    this.masterKey = await T.deriveKey(a, "datacore_salt_static");
   }
   _getVault() {
     try {
@@ -146,33 +146,33 @@ class Me {
     const r = this._getVault();
     if (!r[a]) return null;
     try {
-      return await C.decryptString(r[a], this.masterKey);
+      return await T.decryptString(r[a], this.masterKey);
     } catch {
       return console.error("[WebFallback] Decryption failed for secret:", a), null;
     }
   }
   async setSecret(a, r) {
     if (!this.masterKey) throw new Error("Vault locked. Call unlock(password) first.");
-    const s = this._getVault();
-    s[a] = await C.encryptString(r, this.masterKey), this._saveVault(s);
+    const i = this._getVault();
+    i[a] = await T.encryptString(r, this.masterKey), this._saveVault(i);
   }
   async deleteSecret(a) {
     const r = this._getVault();
     delete r[a], this._saveVault(r);
   }
 }
-var ue;
-const Be = typeof dc < "u" && ((ue = dc == null ? void 0 : dc.app) == null ? void 0 : ue.secretStorage);
-let K = null;
-ye ? K = new Pe() : Be ? K = new De(typeof dc < "u" ? dc : window) : K = new Me();
+var fe;
+const $e = typeof z < "u" && ((fe = z == null ? void 0 : z.app) == null ? void 0 : fe.secretStorage);
+let D = null;
+he ? D = new Oe() : $e ? D = new Be(typeof z < "u" ? z : window) : D = new ze();
 const A = {
-  provider: K,
-  list: async () => await K.listSecrets(),
-  get: async (n) => await K.getSecret(n),
-  set: async (n, a) => await K.setSecret(n, a),
-  delete: async (n) => await K.deleteSecret(n)
+  provider: D,
+  list: async () => await D.listSecrets(),
+  get: async (n) => await D.getSecret(n),
+  set: async (n, a) => await D.setSecret(n, a),
+  delete: async (n) => await D.deleteSecret(n)
 };
-function Oe() {
+function Ue() {
   const n = {
     background: "var(--background-primary)",
     backgroundAlt: "var(--background-secondary)",
@@ -217,16 +217,16 @@ function Oe() {
       flexShrink: 0
     },
     badge: (r) => {
-      let s = "var(--text-muted)", p = "var(--background-secondary-alt)", i = "var(--border-color)";
-      return r === "SECURE MODE" || r === "READY" || r === "✓ SECURE" ? (s = "var(--text-success)", p = "rgba(var(--mono-rgb-100), 0.05)", i = "var(--text-success)") : (r === "LOCKED" || r === "API ERROR" || r === "SAVE FAILED" || r === "MIGRATION FAILED") && (s = "var(--text-error)", p = "rgba(var(--mono-rgb-100), 0.05)", i = "var(--text-error)"), {
+      let i = "var(--text-muted)", d = "var(--background-secondary-alt)", s = "var(--border-color)";
+      return r === "SECURE MODE" || r === "READY" || r === "✓ SECURE" ? (i = "var(--text-success)", d = "rgba(var(--mono-rgb-100), 0.05)", s = "var(--text-success)") : (r === "LOCKED" || r === "API ERROR" || r === "SAVE FAILED" || r === "MIGRATION FAILED") && (i = "var(--text-error)", d = "rgba(var(--mono-rgb-100), 0.05)", s = "var(--text-error)"), {
         padding: "4px 10px",
         borderRadius: "12px",
         fontSize: "10px",
         fontWeight: "bold",
         textTransform: "uppercase",
-        color: s,
-        background: p,
-        border: `1px solid ${i}`,
+        color: i,
+        background: d,
+        border: `1px solid ${s}`,
         opacity: 0.8,
         display: "inline-block"
       };
@@ -475,8 +475,9 @@ function Oe() {
         `
   };
 }
-function ze({ onReload: n, onToggle: a, styles: r, isFullTab: s }) {
-  const p = r.theme, i = {
+const ye = window.dc || window.datacore;
+function Ne({ onReload: n, onToggle: a, styles: r, isFullTab: i }) {
+  const d = r.theme, s = {
     group: {
       display: "flex",
       alignItems: "center",
@@ -502,263 +503,263 @@ function ze({ onReload: n, onToggle: a, styles: r, isFullTab: s }) {
   };
   return h(
     "div",
-    { style: i.group },
+    { style: s.group },
     h(
       "button",
       {
-        style: i.button,
+        style: s.button,
         onClick: n,
         title: "Reload Code",
         onMouseOver: (o) => {
-          o.currentTarget.style.color = p.accent, o.currentTarget.style.background = "rgba(255,255,255,0.05)";
+          o.currentTarget.style.color = d.accent, o.currentTarget.style.background = "rgba(255,255,255,0.05)";
         },
         onMouseOut: (o) => {
           o.currentTarget.style.color = "var(--text-muted)", o.currentTarget.style.background = "none";
         }
       },
-      h(dc.Icon, { icon: "rotate-cw", style: { width: "14px", height: "14px" } })
+      h(ye.Icon, { icon: "rotate-cw", style: { width: "14px", height: "14px" } })
     ),
     h(
       "button",
       {
-        style: i.button,
+        style: s.button,
         onClick: a,
-        title: s ? "Collapse to Compact" : "Expand to Full Tab",
+        title: i ? "Collapse to Compact" : "Expand to Full Tab",
         onMouseOver: (o) => {
-          o.currentTarget.style.color = p.accent, o.currentTarget.style.background = "rgba(255,255,255,0.05)";
+          o.currentTarget.style.color = d.accent, o.currentTarget.style.background = "rgba(255,255,255,0.05)";
         },
         onMouseOut: (o) => {
           o.currentTarget.style.color = "var(--text-muted)", o.currentTarget.style.background = "none";
         }
       },
-      h(dc.Icon, { icon: s ? "minimize-2" : "maximize-2", style: { width: "14px", height: "14px" } })
+      h(ye.Icon, { icon: i ? "minimize-2" : "maximize-2", style: { width: "14px", height: "14px" } })
     )
   );
 }
-const { useState: g, useEffect: pe, useRef: Ne } = dc, { h: t, Fragment: $e } = dc.preact;
-function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullTab: s }) {
-  const p = Oe(), i = p.theme, o = p, x = n + "/data", d = {
+const u = window.dc || window.datacore, { useState: f, useEffect: ge, useRef: Ve } = u, { h: t, Fragment: _e } = u.preact;
+function Le({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullTab: i }) {
+  const d = Ue(), s = d.theme, o = d, x = n + "/data", p = {
     canary: x + "/handshake.enc",
     backup: x + "/vault-secrets.bak.enc",
     history: x + "/bridge-history.json",
     archives: x + "/archives"
-  }, [m, O] = g("LOADING"), [w, ge] = g(""), [H, fe] = g(""), [ee, D] = g(null), [S, v] = g(!1), [V, te] = g(null), [Y, z] = g("Initializing Native API..."), [M, he] = g([]), [k, $] = g({}), [f, B] = g(null), [T, xe] = g([]), [F, be] = g([]), [re, ae] = g(null), [me, U] = g([]), [N, oe] = g(""), [_, ne] = g(""), [P, se] = g("SYSTEM"), u = async (e, c = "info") => {
+  }, [m, $] = f("LOADING"), [S, be] = f(""), [j, xe] = f(""), [re, P] = f(null), [v, k] = f(!1), [F, ae] = f(null), [W, U] = f("Initializing Native API..."), [B, we] = f([]), [E, N] = f({}), [b, O] = f(null), [R, me] = f([]), [J, Se] = f([]), [oe, ne] = f(null), [ve, _] = f([]), [L, se] = f(""), [V, ie] = f(""), [M, ce] = f("SYSTEM"), y = async (e, c = "info") => {
     const l = { msg: e, type: c, time: (/* @__PURE__ */ new Date()).toISOString() };
     try {
-      const b = dc.app.vault.adapter;
-      let y = [];
-      if (await b.exists(d.history))
+      const w = u.app.vault.adapter;
+      let g = [];
+      if (await w.exists(p.history))
         try {
-          y = JSON.parse(await b.read(d.history));
+          g = JSON.parse(await w.read(p.history));
         } catch {
         }
-      y.unshift(l), await b.write(d.history, JSON.stringify(y.slice(0, 200), null, 2)), U(y);
+      g.unshift(l), await w.write(p.history, JSON.stringify(g.slice(0, 200), null, 2)), _(g);
     } catch {
-      U((y) => [l, ...y]);
+      _((g) => [l, ...g]);
     }
-  }, we = async () => {
+  }, ke = async () => {
     try {
-      const e = dc.app.vault.adapter;
-      if (await e.exists(d.history)) {
-        const c = await e.read(d.history);
-        U(JSON.parse(c));
+      const e = u.app.vault.adapter;
+      if (await e.exists(p.history)) {
+        const c = await e.read(p.history);
+        _(JSON.parse(c));
       }
     } catch {
-      U([]);
+      _([]);
     }
   }, I = async () => {
     const e = await A.list();
-    he(e);
-  }, j = () => {
+    we(e);
+  }, q = () => {
     const e = ["token", "key", "secret", "password", "auth", "cred", "api"], c = ["antigravity_debug_config", "antigravity_usage_stats_v1", "antigravity_accounts_v2", "handshake.enc"], l = [];
-    for (let b = 0; b < localStorage.length; b++) {
-      const y = localStorage.key(b);
-      if (y && !c.includes(y) && e.some((E) => y.toLowerCase().includes(E))) {
-        const E = localStorage.getItem(y);
-        E && E.length < 1e3 && l.push(y);
+    for (let w = 0; w < localStorage.length; w++) {
+      const g = localStorage.key(w);
+      if (g && !c.includes(g) && e.some((C) => g.toLowerCase().includes(C))) {
+        const C = localStorage.getItem(g);
+        C && C.length < 1e3 && l.push(g);
       }
     }
-    xe(l);
-  }, J = async () => {
-    const e = dc.app.vault.adapter;
-    if (!await e.exists(d.archives))
-      return await e.mkdir(d.archives), [];
-    const l = ((await e.list(d.archives)).files || []).filter((b) => b.includes("bak.")).sort().reverse();
-    return be(l), l;
-  }, ie = async (e, c = d.backup) => {
+    me(l);
+  }, Q = async () => {
+    const e = u.app.vault.adapter;
+    if (!await e.exists(p.archives))
+      return await e.mkdir(p.archives), [];
+    const l = ((await e.list(p.archives)).files || []).filter((w) => w.includes("bak.")).sort().reverse();
+    return Se(l), l;
+  }, le = async (e, c = p.backup) => {
     try {
-      const l = dc.app.vault.adapter;
+      const l = u.app.vault.adapter;
       if (await l.exists(c)) {
-        const b = await l.read(c), y = await C.decrypt(b, e);
-        $(y), ae(c.split("/").pop());
+        const w = await l.read(c), g = await T.decrypt(w, e);
+        N(g), ne(c.split("/").pop());
       } else
-        $({});
+        N({});
     } catch {
-      $({});
+      N({});
     }
-  }, Se = async () => {
+  }, Ee = async () => {
     try {
-      const e = dc.app.vault.adapter;
-      await e.exists(x) || await e.mkdir(x), await e.exists(d.archives) || await e.mkdir(d.archives), await e.exists(d.canary) ? (O("LOCKED"), z("LOCKED")) : (O("SETUP"), z("SETUP REQUIRED")), await we(), await I(), j();
+      const e = u.app.vault.adapter;
+      await e.exists(x) || await e.mkdir(x), await e.exists(p.archives) || await e.mkdir(p.archives), await e.exists(p.canary) ? ($("LOCKED"), U("LOCKED")) : ($("SETUP"), U("SETUP REQUIRED")), await ke(), await I(), q();
     } catch {
-      O("SETUP"), z("SETUP REQUIRED");
+      $("SETUP"), U("SETUP REQUIRED");
     }
   };
-  pe(() => {
-    Se();
-  }, []), pe(() => {
+  ge(() => {
+    Ee();
+  }, []), ge(() => {
     if (m !== "READY") return;
     const e = setInterval(() => {
-      I(), j();
+      I(), q();
     }, 4e3);
     return () => clearInterval(e);
   }, [m]);
-  const Q = async () => {
-    if (w) {
-      if (w !== H)
-        return D("Passwords do not match.");
-      v(!0), D(null);
+  const X = async () => {
+    if (S) {
+      if (S !== j)
+        return P("Passwords do not match.");
+      k(!0), P(null);
       try {
-        const e = { verifier: "BETO_IDENTITY_VERIFIED", created: Date.now() }, c = await C.encrypt(e, w);
-        await dc.app.vault.adapter.write(d.canary, c), te(w), O("READY"), z("SECURE MODE"), await I(), await u("Master Identity Secured and Keychain Bridge Initialized.", "success");
+        const e = { verifier: "BETO_IDENTITY_VERIFIED", created: Date.now() }, c = await T.encrypt(e, S);
+        await u.app.vault.adapter.write(p.canary, c), ae(S), $("READY"), U("SECURE MODE"), await I(), await y("Master Identity Secured and Keychain Bridge Initialized.", "success");
       } catch (e) {
-        D(e.message), await u("Bridge Setup Failed: " + e.message, "error");
+        P(e.message), await y("Bridge Setup Failed: " + e.message, "error");
       } finally {
-        v(!1);
+        k(!1);
       }
     }
-  }, ce = async () => {
-    if (w) {
-      v(!0), D(null);
+  }, de = async () => {
+    if (S) {
+      k(!0), P(null);
       try {
-        const e = await dc.app.vault.adapter.read(d.canary);
-        await C.decrypt(e, w), te(w), O("READY"), z("SECURE MODE"), await I(), await ie(w), await J(), await u("Vault key decrypted successfully. Access granted.", "success");
+        const e = await u.app.vault.adapter.read(p.canary);
+        await T.decrypt(e, S), ae(S), $("READY"), U("SECURE MODE"), await I(), await le(S), await Q(), await y("Vault key decrypted successfully. Access granted.", "success");
       } catch {
-        D("Incorrect master passphrase."), await u("Failed unlock attempt.", "error");
+        P("Incorrect master passphrase."), await y("Failed unlock attempt.", "error");
       } finally {
-        v(!1);
+        k(!1);
       }
-    }
-  }, ve = async () => {
-    if (!(!N || !_)) {
-      v(!0);
-      try {
-        const e = N.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 64);
-        await A.set(e, _), await u(`Stored secret "${e}" in system keychain.`, "success"), oe(""), ne(""), await I();
-      } catch (e) {
-        await u(`Failed storing secret: ${e.message}`, "error");
-      } finally {
-        v(!1);
-      }
-    }
-  }, ke = async (e) => {
-    B({ id: e, loading: !0 });
-    try {
-      const c = await A.get(e);
-      B({ id: e, value: c, loading: !1 });
-    } catch (c) {
-      B({ id: e, error: c.message, loading: !1 });
-    }
-  }, Ee = async () => {
-    if (!V) return;
-    v(!0), await u("Creating encrypted credential snapshot...", "info");
-    const e = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-"), [c, l] = e.split("T"), b = c.replace(/-/g, "") + "_" + l.split("-").slice(0, 2).join("");
-    try {
-      const y = await A.list(), E = { ...k };
-      let X = 0;
-      for (const R of y) {
-        const de = await A.get(R), Z = k[R];
-        if (Z !== void 0 && Z !== de) {
-          const Ke = `${R} [V_${b}]`;
-          E[Ke] = Z, X++;
-        }
-        E[R] = de;
-      }
-      const le = await C.encrypt(E, V);
-      await dc.app.vault.adapter.write(d.backup, le);
-      const Re = `${d.archives}/bak.${e}.enc`;
-      await dc.app.vault.adapter.write(Re, le);
-      const G = await J();
-      if (G && G.length > 10) {
-        for (let R = 10; R < G.length; R++)
-          await dc.app.vault.adapter.remove(G[R]);
-        await J();
-      }
-      $(E), ae(`bak.${e}.enc`), await u(`Backup complete. Stored ${Object.keys(E).length} keys. ${X ? `(${X} versions archived)` : "Clean Sync."}`, "success"), await I();
-    } catch (y) {
-      await u(`Backup failed: ${y.message}`, "error");
-    } finally {
-      v(!1);
     }
   }, Ce = async () => {
-    v(!0), await u("Omni-redeploying secrets to OS Keychain...", "info");
+    if (!(!L || !V)) {
+      k(!0);
+      try {
+        const e = L.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 64);
+        await A.set(e, V), await y(`Stored secret "${e}" in system keychain.`, "success"), se(""), ie(""), await I();
+      } catch (e) {
+        await y(`Failed storing secret: ${e.message}`, "error");
+      } finally {
+        k(!1);
+      }
+    }
+  }, Te = async (e) => {
+    O({ id: e, loading: !0 });
     try {
-      const e = Object.keys(k);
+      const c = await A.get(e);
+      O({ id: e, value: c, loading: !1 });
+    } catch (c) {
+      O({ id: e, error: c.message, loading: !1 });
+    }
+  }, Ie = async () => {
+    if (!F) return;
+    k(!0), await y("Creating encrypted credential snapshot...", "info");
+    const e = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-"), [c, l] = e.split("T"), w = c.replace(/-/g, "") + "_" + l.split("-").slice(0, 2).join("");
+    try {
+      const g = await A.list(), C = { ...E };
+      let ee = 0;
+      for (const K of g) {
+        const ue = await A.get(K), te = E[K];
+        if (te !== void 0 && te !== ue) {
+          const Me = `${K} [V_${w}]`;
+          C[Me] = te, ee++;
+        }
+        C[K] = ue;
+      }
+      const pe = await T.encrypt(C, F);
+      await u.app.vault.adapter.write(p.backup, pe);
+      const Pe = `${p.archives}/bak.${e}.enc`;
+      await u.app.vault.adapter.write(Pe, pe);
+      const H = await Q();
+      if (H && H.length > 10) {
+        for (let K = 10; K < H.length; K++)
+          await u.app.vault.adapter.remove(H[K]);
+        await Q();
+      }
+      N(C), ne(`bak.${e}.enc`), await y(`Backup complete. Stored ${Object.keys(C).length} keys. ${ee ? `(${ee} versions archived)` : "Clean Sync."}`, "success"), await I();
+    } catch (g) {
+      await y(`Backup failed: ${g.message}`, "error");
+    } finally {
+      k(!1);
+    }
+  }, Ae = async () => {
+    k(!0), await y("Omni-redeploying secrets to OS Keychain...", "info");
+    try {
+      const e = Object.keys(E);
       let c = 0;
       for (const l of e) {
         if (l.includes("[V_")) continue;
-        await A.get(l) !== k[l] && (await A.set(l, k[l]), c++);
+        await A.get(l) !== E[l] && (await A.set(l, E[l]), c++);
       }
-      await u(`Omni-Restore completed. Recovered/updated ${c} secrets.`, "success"), await I();
+      await y(`Omni-Restore completed. Recovered/updated ${c} secrets.`, "success"), await I();
     } catch (e) {
-      await u(`Restore failed: ${e.message}`, "error");
+      await y(`Restore failed: ${e.message}`, "error");
     } finally {
-      v(!1);
+      k(!1);
     }
-  }, Ie = async (e) => {
+  }, Re = async (e) => {
     if (confirm(`Permanently purge "${e}" from your computer's keychain?`))
       try {
-        await A.delete(e), await u(`Purged system key "${e}".`, "success"), await I(), (f == null ? void 0 : f.id) === e && B(null);
+        await A.delete(e), await y(`Purged system key "${e}".`, "success"), await I(), (b == null ? void 0 : b.id) === e && O(null);
       } catch (c) {
-        await u(`Purge failed: ${c.message}`, "error");
+        await y(`Purge failed: ${c.message}`, "error");
       }
-  }, Ae = async (e) => {
+  }, Ke = async (e) => {
     if (confirm(`Remove "${e}" from backup? (Requires saving backup file)`))
       try {
-        const c = { ...k };
+        const c = { ...E };
         delete c[e];
-        const l = await C.encrypt(c, V);
-        await dc.app.vault.adapter.write(d.backup, l), $(c), await u(`Erased "${e}" from backup snapshot.`, "success");
+        const l = await T.encrypt(c, F);
+        await u.app.vault.adapter.write(p.backup, l), N(c), await y(`Erased "${e}" from backup snapshot.`, "success");
       } catch (c) {
-        await u(`Backup edit failed: ${c.message}`, "error");
+        await y(`Backup edit failed: ${c.message}`, "error");
       }
-  }, Te = async () => {
-    if (confirm(`Secure and migrate all ${T.length} discovered keys into OS Keychain?`)) {
-      v(!0);
+  }, De = async () => {
+    if (confirm(`Secure and migrate all ${R.length} discovered keys into OS Keychain?`)) {
+      k(!0);
       try {
-        for (const e of T) {
+        for (const e of R) {
           const c = localStorage.getItem(e), l = e.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 64);
           await A.set(l, c), localStorage.removeItem(e);
         }
-        await u(`Migrated ${T.length} credentials from plain-text localStorage.`, "success"), j(), await I();
+        await y(`Migrated ${R.length} credentials from plain-text localStorage.`, "success"), q(), await I();
       } catch (e) {
-        await u(`Migration failed: ${e.message}`, "error");
+        await y(`Migration failed: ${e.message}`, "error");
       } finally {
-        v(!1);
+        k(!1);
       }
     }
-  }, L = (e) => t(
+  }, Y = (e) => t(
     "span",
     {
       style: { marginLeft: "6px", verticalAlign: "middle", display: "inline-flex", opacity: 0.6, cursor: "help" },
       title: e
     },
-    t(dc.Icon, { icon: "help-circle", style: { width: "13px", height: "13px" } })
+    t(u.Icon, { icon: "help-circle", style: { width: "13px", height: "13px" } })
   );
   if (!r)
     return t(
       "div",
-      { style: o.compactWrapper, onClick: s },
+      { style: o.compactWrapper, onClick: i },
       t(
         "div",
         { style: { display: "flex", alignItems: "center", gap: "12px" } },
-        t(dc.Icon, { icon: "shield", style: { width: 18, color: T.length > 0 ? "#f87171" : "#4ade80" } }),
-        t(dc.Icon, { icon: "key", style: { width: 18, color: "#4ade80" } }),
-        t("span", { style: o.compactText }, `Keychain Bridge • ${M.length} Keys ${T.length > 0 ? `(+${T.length} Leaks)` : ""}`)
+        t(u.Icon, { icon: "shield", style: { width: 18, color: R.length > 0 ? "#f87171" : "#4ade80" } }),
+        t(u.Icon, { icon: "key", style: { width: 18, color: "#4ade80" } }),
+        t("span", { style: o.compactText }, `Keychain Bridge • ${B.length} Keys ${R.length > 0 ? `(+${R.length} Leaks)` : ""}`)
       ),
-      t("div", { style: o.badge(Y) }, Y)
+      t("div", { style: o.badge(W) }, W)
     );
-  const W = w && w === H, q = !!w;
+  const G = S && S === j, Z = !!S;
   return t(
     "div",
     { style: o.wrapper },
@@ -767,7 +768,7 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
     t(
       "div",
       { style: { position: "absolute", top: "24px", right: "24px", zIndex: 100 } },
-      t(ze, { onReload: a, onToggle: s, styles: o, isFullTab: r })
+      t(Ne, { onReload: a, onToggle: i, styles: o, isFullTab: r })
     ),
     t(
       "div",
@@ -777,7 +778,7 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
         "div",
         { style: { display: "flex", alignItems: "center", gap: "16px", marginTop: "6px" } },
         t("div", { style: o.subtitle }, "Unified Local OS Keyring & Encrypted backups"),
-        t("div", { style: o.badge(Y) }, Y)
+        t("div", { style: o.badge(W) }, W)
       )
     ),
     // Locked / Setup Handshake Screen
@@ -794,7 +795,7 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
         ),
         t(
           "p",
-          { style: { margin: 0, fontSize: "11px", color: i.foregroundMuted, textAlign: "center", lineHeight: "1.4" } },
+          { style: { margin: 0, fontSize: "11px", color: s.foregroundMuted, textAlign: "center", lineHeight: "1.4" } },
           m === "SETUP" ? "Set a master password to encrypt your credential backups in your local vault. We do not store this password." : "Enter your master passphrase to unlock the local secure credential bridge and load backups."
         ),
         t(
@@ -804,12 +805,12 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
             style: o.input,
             type: "password",
             placeholder: "Master Passphrase",
-            value: w,
+            value: S,
             onChange: (e) => {
-              ge(e.target.value), D(null);
+              be(e.target.value), P(null);
             },
             onKeyDown: (e) => {
-              e.key === "Enter" && !S && (m === "SETUP" ? W && Q() : q && ce());
+              e.key === "Enter" && !v && (m === "SETUP" ? G && X() : Z && de());
             },
             autoFocus: !0
           }),
@@ -817,29 +818,29 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
             style: o.input,
             type: "password",
             placeholder: "Confirm Passphrase",
-            value: H,
+            value: j,
             onChange: (e) => {
-              fe(e.target.value), D(null);
+              xe(e.target.value), P(null);
             },
             onKeyDown: (e) => {
-              e.key === "Enter" && W && !S && Q();
+              e.key === "Enter" && G && !v && X();
             }
           })
         ),
-        ee && t("div", { style: { color: "#f87171", fontSize: "11px", textAlign: "center", fontWeight: "bold" } }, ee),
+        re && t("div", { style: { color: "#f87171", fontSize: "11px", textAlign: "center", fontWeight: "bold" } }, re),
         t("button", {
-          style: o.buttonPrimary(m === "SETUP" ? !W || S : !q || S),
-          disabled: m === "SETUP" ? !W || S : !q || S,
-          onClick: m === "SETUP" ? Q : ce
-        }, S ? "Decrypting..." : m === "SETUP" ? "INITIALIZE KEYCHAIN BRIDGE" : "UNLOCK KEYCHAIN BRIDGE")
+          style: o.buttonPrimary(m === "SETUP" ? !G || v : !Z || v),
+          disabled: m === "SETUP" ? !G || v : !Z || v,
+          onClick: m === "SETUP" ? X : de
+        }, v ? "Decrypting..." : m === "SETUP" ? "INITIALIZE KEYCHAIN BRIDGE" : "UNLOCK KEYCHAIN BRIDGE")
       )
     ),
     // Authenticated Worksheets
     m === "READY" && t(
-      $e,
+      _e,
       null,
       // Security Leaks Banner
-      T.length > 0 && t(
+      R.length > 0 && t(
         "div",
         { style: o.leakBox },
         t(
@@ -848,16 +849,16 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
           t(
             "div",
             { style: { color: "#f87171", fontWeight: "bold", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" } },
-            t(dc.Icon, { icon: "alert-triangle", style: { width: 14 } }),
+            t(u.Icon, { icon: "alert-triangle", style: { width: 14 } }),
             "SECURITY LEAK DETECTED"
           ),
           t(
             "div",
-            { style: { fontSize: "11px", color: i.foregroundMuted, marginTop: "2px" } },
-            `${T.length} sensitive item(s) found in plain-text storage. A single click will move them to your OS keychain.`
+            { style: { fontSize: "11px", color: s.foregroundMuted, marginTop: "2px" } },
+            `${R.length} sensitive item(s) found in plain-text storage. A single click will move them to your OS keychain.`
           )
         ),
-        t("button", { style: { ...o.buttonSecondary, background: "#f87171", color: "#fff", border: "none", fontWeight: "600" }, onClick: Te }, "MIGRATE ALL TO KEYCHAIN")
+        t("button", { style: { ...o.buttonSecondary, background: "#f87171", color: "#fff", border: "none", fontWeight: "600" }, onClick: De }, "MIGRATE ALL TO KEYCHAIN")
       ),
       // Main Columns Grid
       t(
@@ -877,23 +878,23 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
                 "span",
                 { style: o.cardLabel },
                 "Backup & Restore",
-                L("Operations to sync your credentials between this computer and your local vault backup.")
+                Y("Operations to sync your credentials between this computer and your local vault backup.")
               )
             ),
-            t("button", { style: o.buttonPrimary(S), disabled: S, onClick: Ee }, "Export Computer Keys to Backup (.enc)"),
+            t("button", { style: o.buttonPrimary(v), disabled: v, onClick: Ie }, "Export Computer Keys to Backup (.enc)"),
             t("button", {
               style: { ...o.buttonSecondary, marginTop: "4px", width: "100%", padding: "10px" },
-              disabled: S || Object.keys(k).length === 0,
-              onClick: Ce
+              disabled: v || Object.keys(E).length === 0,
+              onClick: Ae
             }, "Import Backup (.enc) to Computer"),
             t(
               "div",
-              { style: { borderTop: `1px solid ${i.border}`, paddingTop: "12px", marginTop: "10px" } },
+              { style: { borderTop: `1px solid ${s.border}`, paddingTop: "12px", marginTop: "10px" } },
               t(
                 "div",
-                { style: { color: i.foregroundMuted, fontSize: "10px", fontWeight: "bold", marginBottom: "8px" } },
+                { style: { color: s.foregroundMuted, fontSize: "10px", fontWeight: "bold", marginBottom: "8px" } },
                 "ADD KEY TO COMPUTER",
-                L("Saves a new secret credential directly to your computer's secure OS keychain.")
+                Y("Saves a new secret credential directly to your computer's secure OS keychain.")
               ),
               t(
                 "div",
@@ -901,20 +902,20 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
                 t("input", {
                   style: o.input,
                   placeholder: "Identifier / Name (e.g. openai-key)",
-                  value: N,
-                  onChange: (e) => oe(e.target.value)
+                  value: L,
+                  onChange: (e) => se(e.target.value)
                 }),
                 t("input", {
                   style: o.input,
                   type: "password",
                   placeholder: "Secret Value (Token/Password)",
-                  value: _,
-                  onChange: (e) => ne(e.target.value)
+                  value: V,
+                  onChange: (e) => ie(e.target.value)
                 }),
                 t("button", {
-                  style: o.buttonPrimary(!N || !_ || S),
-                  disabled: !N || !_ || S,
-                  onClick: ve
+                  style: o.buttonPrimary(!L || !V || v),
+                  disabled: !L || !V || v,
+                  onClick: Ce
                 }, "Save Secret to Computer")
               )
             )
@@ -926,32 +927,32 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
           { style: o.glassCard },
           t(
             "div",
-            { style: { display: "flex", gap: "5px", padding: "4px", background: i.backgroundAlt2, borderRadius: "6px", flexShrink: 0 } },
+            { style: { display: "flex", gap: "5px", padding: "4px", background: s.backgroundAlt2, borderRadius: "6px", flexShrink: 0 } },
             t(
               "button",
-              { style: o.tabBtn(P === "SYSTEM"), onClick: () => se("SYSTEM") },
+              { style: o.tabBtn(M === "SYSTEM"), onClick: () => ce("SYSTEM") },
               "ON COMPUTER",
-              L("Credentials currently stored securely in your OS Keychain.")
+              Y("Credentials currently stored securely in your OS Keychain.")
             ),
             t(
               "button",
-              { style: o.tabBtn(P === "BACKUP"), onClick: () => se("BACKUP") },
+              { style: o.tabBtn(M === "BACKUP"), onClick: () => ce("BACKUP") },
               "IN BACKUP FILE",
-              L("Credentials stored in your encrypted backup snapshot file.")
+              Y("Credentials stored in your encrypted backup snapshot file.")
             )
           ),
-          P === "BACKUP" && F.length > 0 && t(
+          M === "BACKUP" && J.length > 0 && t(
             "div",
-            { style: { padding: "8px 10px", background: i.backgroundAlt2, borderRadius: "4px", display: "flex", gap: "10px", alignItems: "center", flexShrink: 0 } },
+            { style: { padding: "8px 10px", background: s.backgroundAlt2, borderRadius: "4px", display: "flex", gap: "10px", alignItems: "center", flexShrink: 0 } },
             t("span", { style: { fontSize: "9px", opacity: 0.6, fontWeight: "bold" } }, "SNAPSHOTS:"),
             t(
               "select",
               {
-                style: { background: i.backgroundAlt, color: i.accent, border: `1px solid ${i.border}`, fontSize: "10px", flex: 1, padding: "4px" },
-                value: re === "vault-secrets.bak.enc" ? F[0] : re,
-                onChange: (e) => ie(V, e.target.value.includes("/") ? e.target.value : `${d.archives}/${e.target.value}`)
+                style: { background: s.backgroundAlt, color: s.accent, border: `1px solid ${s.border}`, fontSize: "10px", flex: 1, padding: "4px" },
+                value: oe === "vault-secrets.bak.enc" ? J[0] : oe,
+                onChange: (e) => le(F, e.target.value.includes("/") ? e.target.value : `${p.archives}/${e.target.value}`)
               },
-              F.map(
+              J.map(
                 (e) => t("option", { key: e, value: e }, e.split("bak.").pop().replace(".enc", "").replace(/-/g, ":"))
               )
             )
@@ -959,7 +960,7 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
           t(
             "div",
             { style: o.scroll },
-            (P === "SYSTEM" ? M : Object.keys(k)).map(
+            (M === "SYSTEM" ? B : Object.keys(E)).map(
               (e) => t(
                 "div",
                 { key: e, style: o.listItem },
@@ -967,10 +968,10 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
                   "div",
                   { style: { display: "flex", flexDirection: "column", gap: "2px", flex: 1, minWidth: 0 } },
                   t("span", { style: { fontWeight: "600", fontSize: "13px", color: "#fff", wordBreak: "break-all" } }, e),
-                  (f == null ? void 0 : f.id) === e && t(
+                  (b == null ? void 0 : b.id) === e && t(
                     "div",
                     { style: o.resultPanel },
-                    f.loading ? t("span", { style: { fontSize: "11px", color: i.foregroundMuted } }, "Decrypting...") : f.error ? t("span", { style: { fontSize: "11px", color: i.red } }, `Error: ${f.error}`) : t("div", { style: o.resultCode }, f.value)
+                    b.loading ? t("span", { style: { fontSize: "11px", color: s.foregroundMuted } }, "Decrypting...") : b.error ? t("span", { style: { fontSize: "11px", color: s.red } }, `Error: ${b.error}`) : t("div", { style: o.resultCode }, b.value)
                   )
                 ),
                 t(
@@ -981,25 +982,25 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
                     {
                       className: "keychain-bridge-action-btn",
                       onClick: () => {
-                        (f == null ? void 0 : f.id) === e ? B(null) : P === "SYSTEM" ? ke(e) : B({ id: e, value: k[e], loading: !1 });
+                        (b == null ? void 0 : b.id) === e ? O(null) : M === "SYSTEM" ? Te(e) : O({ id: e, value: E[e], loading: !1 });
                       }
                     },
-                    t(dc.Icon, { icon: (f == null ? void 0 : f.id) === e ? "eye-off" : "eye", style: { width: 14 } })
+                    t(u.Icon, { icon: (b == null ? void 0 : b.id) === e ? "eye-off" : "eye", style: { width: 14 } })
                   ),
                   t(
                     "button",
                     {
                       className: "keychain-bridge-delete-btn",
-                      onClick: () => P === "SYSTEM" ? Ie(e) : Ae(e)
+                      onClick: () => M === "SYSTEM" ? Re(e) : Ke(e)
                     },
-                    t(dc.Icon, { icon: "trash-2", style: { width: 14 } })
+                    t(u.Icon, { icon: "trash-2", style: { width: 14 } })
                   )
                 )
               )
             ),
-            (P === "SYSTEM" ? M : Object.keys(k)).length === 0 && t(
+            (M === "SYSTEM" ? B : Object.keys(E)).length === 0 && t(
               "div",
-              { style: { padding: "40px", textAlign: "center", color: i.foregroundMuted, fontSize: "12px" } },
+              { style: { padding: "40px", textAlign: "center", color: s.foregroundMuted, fontSize: "12px" } },
               "No keys found in this section."
             )
           )
@@ -1015,14 +1016,14 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
               "span",
               { style: o.cardLabel },
               "Bridge Activity Log",
-              L("Audited trail of keychain actions, unlocks, backups, and restores.")
+              Y("Audited trail of keychain actions, unlocks, backups, and restores.")
             ),
             t("button", {
-              style: { background: "none", border: "none", color: i.foregroundMuted, cursor: "pointer", fontSize: "9px" },
+              style: { background: "none", border: "none", color: s.foregroundMuted, cursor: "pointer", fontSize: "9px" },
               onClick: () => {
-                U([]);
+                _([]);
                 try {
-                  dc.app.vault.adapter.remove(d.history);
+                  u.app.vault.adapter.remove(p.history);
                 } catch {
                 }
               }
@@ -1031,23 +1032,23 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
           t(
             "div",
             { style: o.scroll },
-            me.map(
+            ve.map(
               (e, c) => t(
                 "div",
                 { key: c, className: "keychain-bridge-log-item" },
-                t("div", { style: { opacity: 0.4, fontSize: "8px", color: i.foregroundMuted } }, new Date(e.time).toLocaleString()),
-                t("div", { style: { color: e.type === "success" ? i.green : e.type === "error" ? i.red : i.foreground, fontSize: "11px", marginTop: "2px" } }, e.msg)
+                t("div", { style: { opacity: 0.4, fontSize: "8px", color: s.foregroundMuted } }, new Date(e.time).toLocaleString()),
+                t("div", { style: { color: e.type === "success" ? s.green : e.type === "error" ? s.red : s.foreground, fontSize: "11px", marginTop: "2px" } }, e.msg)
               )
             )
           ),
           t(
             "div",
-            { style: { marginTop: "auto", padding: "12px", background: i.backgroundAlt2, borderRadius: "6px", border: `1px solid ${i.border}`, flexShrink: 0 } },
-            t("div", { style: { fontSize: "13px", fontWeight: "bold", color: "#fff" } }, `${M.length} System Keys`),
+            { style: { marginTop: "auto", padding: "12px", background: s.backgroundAlt2, borderRadius: "6px", border: `1px solid ${s.border}`, flexShrink: 0 } },
+            t("div", { style: { fontSize: "13px", fontWeight: "bold", color: "#fff" } }, `${B.length} System Keys`),
             t(
               "div",
-              { style: { fontSize: "11px", color: Object.keys(k).filter((e) => !M.includes(e)).length > 0 ? i.red : i.green, marginTop: "2px" } },
-              Object.keys(k).filter((e) => !M.includes(e)).length > 0 ? "Sync Mismatch: Keys pending backup" : "✓ Secure System Sync"
+              { style: { fontSize: "11px", color: Object.keys(E).filter((e) => !B.includes(e)).length > 0 ? s.red : s.green, marginTop: "2px" } },
+              Object.keys(E).filter((e) => !B.includes(e)).length > 0 ? "Sync Mismatch: Keys pending backup" : "✓ Secure System Sync"
             )
           )
         )
@@ -1055,17 +1056,21 @@ function Ue({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
     )
   );
 }
-function _e(n, a) {
+function Ye(n, a, r = {}) {
   window.React || (window.React = a.preact), window.ReactDOM || (window.ReactDOM = a.preact);
-  const { h: r, render: s } = a.preact;
-  return s(r(Ue, {
-    folderPath: "KEYCHAIN BRIDGE",
-    isFullTab: !0,
+  const { h: i, render: d } = a.preact, s = {
+    folderPath: r.folderPath || "KEYCHAIN BRIDGE",
+    isFullTab: r.isFullTab !== void 0 ? r.isFullTab : !0,
+    onCodeReloadRequest: r.onCodeReloadRequest || (() => {
+    }),
+    onToggleFullTab: r.onToggleFullTab || (() => {
+    }),
     dc: a
-  }), n), () => {
-    s(null, n);
+  };
+  return d(i(Le, s), n), () => {
+    d(null, n);
   };
 }
 export {
-  _e as mount_app
+  Ye as mount_app
 };

@@ -1,3 +1,5 @@
+const dc = window.dc || window.datacore;
+
 import { Crypto  } from "KEYCHAIN BRIDGE/src/utils/CryptoUtils.js";
 
 // --- Providers Inline ---
