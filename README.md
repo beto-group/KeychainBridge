@@ -49,11 +49,11 @@ The package exposes the following compiled files:
 | File | Description |
 | :--- | :--- |
 | **[KEYCHAIN BRIDGE.md](KEYCHAIN%20BRIDGE.md)** | Main entry point leaf designed to mount the component in Obsidian. |
-| **[src/index.jsx](src/index.jsx)** | Main bootstrap loader and full-tab viewport manager. |
-| **[src/App.jsx](src/App.jsx)** | Main React component handling the master keyring interface and crypto operations. |
+| **[_RESOURCES/DATACORE/_DONE/KEYCHAIN BRIDGE/src/index.jsx](_RESOURCES/DATACORE/_DONE/KEYCHAIN%20BRIDGE/src/index.jsx)** | Main bootstrap loader and full-tab viewport manager. |
+| **[_RESOURCES/DATACORE/_DONE/KEYCHAIN BRIDGE/src/App.jsx](_RESOURCES/DATACORE/_DONE/KEYCHAIN%20BRIDGE/src/App.jsx)** | Main React component handling the master keyring interface and crypto operations. |
 | **[src/utils/CryptoUtils.js](src/utils/CryptoUtils.js)** | Cryptographic utility routines (PBKDF2, AES-GCM, Base64). |
 | **[src/utils/StorageUtils.js](src/utils/StorageUtils.js)** | Native SecretStorage and fallback key management. |
 | **[src/styles/ViewStyles.jsx](src/styles/ViewStyles.jsx)** | Glassmorphic, dark theme-aware stylesheet parameters. |
-| **[METADATA.md](METADATA.md)** | Packaging manifest outlining indexing, target, and security configurations. |
-| **[CONTRIBUTION.md](CONTRIBUTION.md)** | Contributor architecture standards and local compilation guidelines. |
-| **[LICENSE.md](LICENSE.md)** | MIT open-source license. |
+| **[METADATA.md](_RESOURCES/DATACORE/_DONE/KEYCHAIN%20BRIDGE/METADATA.md)** | Packaging manifest outlining indexing, target, and security configurations. |
+| **[CONTRIBUTION.md](_RESOURCES/DATACORE/_DONE/KEYCHAIN%20BRIDGE/CONTRIBUTION.md)** | Contributor architecture standards and local compilation guidelines. |
+| **[LICENSE.md](_RESOURCES/DATACORE/_DONE/KEYCHAIN%20BRIDGE/LICENSE.md)** | MIT open-source license. |
