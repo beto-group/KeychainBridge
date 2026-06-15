@@ -50,7 +50,7 @@ const T = {
     return new TextDecoder().decode(s);
   }
 }, z = window.dc || window.datacore;
-class Be {
+class Me {
   constructor(a) {
     var r;
     this.secretStorage = ((r = a == null ? void 0 : a.app) == null ? void 0 : r.secretStorage) || window.app && window.app.secretStorage;
@@ -164,7 +164,7 @@ class ze {
 var fe;
 const $e = typeof z < "u" && ((fe = z == null ? void 0 : z.app) == null ? void 0 : fe.secretStorage);
 let D = null;
-he ? D = new Oe() : $e ? D = new Be(typeof z < "u" ? z : window) : D = new ze();
+he ? D = new Oe() : $e ? D = new Me(typeof z < "u" ? z : window) : D = new ze();
 const A = {
   provider: D,
   list: async () => await D.listSecrets(),
@@ -543,7 +543,7 @@ function Le({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
     backup: x + "/vault-secrets.bak.enc",
     history: x + "/bridge-history.json",
     archives: x + "/archives"
-  }, [m, $] = f("LOADING"), [S, be] = f(""), [j, xe] = f(""), [re, P] = f(null), [v, k] = f(!1), [F, ae] = f(null), [W, U] = f("Initializing Native API..."), [B, we] = f([]), [E, N] = f({}), [b, O] = f(null), [R, me] = f([]), [J, Se] = f([]), [oe, ne] = f(null), [ve, _] = f([]), [L, se] = f(""), [V, ie] = f(""), [M, ce] = f("SYSTEM"), y = async (e, c = "info") => {
+  }, [m, $] = f("LOADING"), [S, be] = f(""), [j, xe] = f(""), [re, P] = f(null), [v, k] = f(!1), [F, ae] = f(null), [W, U] = f("Initializing Native API..."), [M, we] = f([]), [E, N] = f({}), [b, O] = f(null), [R, me] = f([]), [J, Se] = f([]), [oe, ne] = f(null), [ve, _] = f([]), [L, se] = f(""), [V, ie] = f(""), [B, ce] = f("SYSTEM"), y = async (e, c = "info") => {
     const l = { msg: e, type: c, time: (/* @__PURE__ */ new Date()).toISOString() };
     try {
       const w = u.app.vault.adapter;
@@ -670,8 +670,8 @@ function Le({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
       for (const K of g) {
         const ue = await A.get(K), te = E[K];
         if (te !== void 0 && te !== ue) {
-          const Me = `${K} [V_${w}]`;
-          C[Me] = te, ee++;
+          const Be = `${K} [V_${w}]`;
+          C[Be] = te, ee++;
         }
         C[K] = ue;
       }
@@ -755,7 +755,7 @@ function Le({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
         { style: { display: "flex", alignItems: "center", gap: "12px" } },
         t(u.Icon, { icon: "shield", style: { width: 18, color: R.length > 0 ? "#f87171" : "#4ade80" } }),
         t(u.Icon, { icon: "key", style: { width: 18, color: "#4ade80" } }),
-        t("span", { style: o.compactText }, `Keychain Bridge • ${B.length} Keys ${R.length > 0 ? `(+${R.length} Leaks)` : ""}`)
+        t("span", { style: o.compactText }, `Keychain Bridge • ${M.length} Keys ${R.length > 0 ? `(+${R.length} Leaks)` : ""}`)
       ),
       t("div", { style: o.badge(W) }, W)
     );
@@ -930,18 +930,18 @@ function Le({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
             { style: { display: "flex", gap: "5px", padding: "4px", background: s.backgroundAlt2, borderRadius: "6px", flexShrink: 0 } },
             t(
               "button",
-              { style: o.tabBtn(M === "SYSTEM"), onClick: () => ce("SYSTEM") },
+              { style: o.tabBtn(B === "SYSTEM"), onClick: () => ce("SYSTEM") },
               "ON COMPUTER",
               Y("Credentials currently stored securely in your OS Keychain.")
             ),
             t(
               "button",
-              { style: o.tabBtn(M === "BACKUP"), onClick: () => ce("BACKUP") },
+              { style: o.tabBtn(B === "BACKUP"), onClick: () => ce("BACKUP") },
               "IN BACKUP FILE",
               Y("Credentials stored in your encrypted backup snapshot file.")
             )
           ),
-          M === "BACKUP" && J.length > 0 && t(
+          B === "BACKUP" && J.length > 0 && t(
             "div",
             { style: { padding: "8px 10px", background: s.backgroundAlt2, borderRadius: "4px", display: "flex", gap: "10px", alignItems: "center", flexShrink: 0 } },
             t("span", { style: { fontSize: "9px", opacity: 0.6, fontWeight: "bold" } }, "SNAPSHOTS:"),
@@ -960,7 +960,7 @@ function Le({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
           t(
             "div",
             { style: o.scroll },
-            (M === "SYSTEM" ? B : Object.keys(E)).map(
+            (B === "SYSTEM" ? M : Object.keys(E)).map(
               (e) => t(
                 "div",
                 { key: e, style: o.listItem },
@@ -982,7 +982,7 @@ function Le({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
                     {
                       className: "keychain-bridge-action-btn",
                       onClick: () => {
-                        (b == null ? void 0 : b.id) === e ? O(null) : M === "SYSTEM" ? Te(e) : O({ id: e, value: E[e], loading: !1 });
+                        (b == null ? void 0 : b.id) === e ? O(null) : B === "SYSTEM" ? Te(e) : O({ id: e, value: E[e], loading: !1 });
                       }
                     },
                     t(u.Icon, { icon: (b == null ? void 0 : b.id) === e ? "eye-off" : "eye", style: { width: 14 } })
@@ -991,14 +991,14 @@ function Le({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
                     "button",
                     {
                       className: "keychain-bridge-delete-btn",
-                      onClick: () => M === "SYSTEM" ? Re(e) : Ke(e)
+                      onClick: () => B === "SYSTEM" ? Re(e) : Ke(e)
                     },
                     t(u.Icon, { icon: "trash-2", style: { width: 14 } })
                   )
                 )
               )
             ),
-            (M === "SYSTEM" ? B : Object.keys(E)).length === 0 && t(
+            (B === "SYSTEM" ? M : Object.keys(E)).length === 0 && t(
               "div",
               { style: { padding: "40px", textAlign: "center", color: s.foregroundMuted, fontSize: "12px" } },
               "No keys found in this section."
@@ -1044,11 +1044,11 @@ function Le({ folderPath: n, onCodeReloadRequest: a, isFullTab: r, onToggleFullT
           t(
             "div",
             { style: { marginTop: "auto", padding: "12px", background: s.backgroundAlt2, borderRadius: "6px", border: `1px solid ${s.border}`, flexShrink: 0 } },
-            t("div", { style: { fontSize: "13px", fontWeight: "bold", color: "#fff" } }, `${B.length} System Keys`),
+            t("div", { style: { fontSize: "13px", fontWeight: "bold", color: "#fff" } }, `${M.length} System Keys`),
             t(
               "div",
-              { style: { fontSize: "11px", color: Object.keys(E).filter((e) => !B.includes(e)).length > 0 ? s.red : s.green, marginTop: "2px" } },
-              Object.keys(E).filter((e) => !B.includes(e)).length > 0 ? "Sync Mismatch: Keys pending backup" : "✓ Secure System Sync"
+              { style: { fontSize: "11px", color: Object.keys(E).filter((e) => !M.includes(e)).length > 0 ? s.red : s.green, marginTop: "2px" } },
+              Object.keys(E).filter((e) => !M.includes(e)).length > 0 ? "Sync Mismatch: Keys pending backup" : "✓ Secure System Sync"
             )
           )
         )
@@ -1072,5 +1072,6 @@ function Ye(n, a, r = {}) {
   };
 }
 export {
+  Le as KeychainBridge,
   Ye as mount_app
 };

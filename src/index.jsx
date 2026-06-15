@@ -59,9 +59,6 @@ async function View({ folderPath }) {
 
         // Load ESM Bundle
         dc.useEffect(() => {
-            let active = true;
-            let cleanup = null;
-
             const load = async () => {
                 try {
                     // Inject global context bridge for the ESM bundle
@@ -75,33 +72,16 @@ async function View({ folderPath }) {
                     
                     // Dynamically import the compiled module
                     const module = await import(url);
-                    if (!active) return;
-
-                    // Execute the native Sovereign Inspector WASM/ESM entrypoint
-                    const instanceCleanup = await module.mount_app(containerRef.current, dc, {
-                        folderPath: folderPath,
-                        isFullTab: isFullTab,
-                        onCodeReloadRequest: () => setKey(k => k + 1),
-                        onToggleFullTab: () => setIsFullTab(!isFullTab)
-                    });
-                    if (!active) {
-                        if (instanceCleanup) instanceCleanup();
-                        return;
-                    }
-                    cleanup = instanceCleanup;
-                    setApp(true);
+                    
+                    // Extract the raw React component and render it natively to avoid Preact __k node collisions
+                    setApp({ KeychainBridge: module.KeychainBridge });
                     setError(null);
                 } catch (e) {
                     console.error("Critical Load Error:", e);
-                    if (active) setError(e);
+                    setError(e);
                 }
             };
             load();
-
-            return () => {
-                active = false;
-                if (cleanup) cleanup();
-            };
         }, [key]);
 
         // Helpers for portal reparenting
@@ -236,8 +216,17 @@ async function View({ folderPath }) {
             );
         }
 
+        const { KeychainBridge } = app;
         return (
-            <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+            <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+                <KeychainBridge 
+                    key={key} 
+                    folderPath={folderPath} 
+                    onCodeReloadRequest={() => setKey(k => k + 1)}
+                    isFullTab={isFullTab}
+                    onToggleFullTab={() => setIsFullTab(!isFullTab)}
+                />
+            </div>
         );
     };
 

@@ -18,5 +18,9 @@ export default defineConfig({
       // Externalize capacitor so it doesn't try to bundle native bridge
       external: ['capacitor-secure-storage-plugin']
     }
+  },
+  esbuild: {
+    jsxFactory: 'dc.preact.h',
+    jsxFragment: 'dc.preact.Fragment'
   }
 });

@@ -66,6 +66,8 @@ const entrypointPath = path.join(DEST_DIR, 'index.jsx');
 const entrypointCode = `
 import { KeychainBridge } from "KEYCHAIN BRIDGE/src/App.jsx";
 
+export { KeychainBridge };
+
 export function mount_app(container, dc, options = {}) {
     // Inject React and ReactDOM into global scope if missing (for preact/compat)
     if (!window.React) window.React = dc.preact;
