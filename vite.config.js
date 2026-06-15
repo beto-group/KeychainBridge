@@ -2,21 +2,21 @@ import { defineConfig } from 'vite';
 import path from 'path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      'KEYCHAIN BRIDGE/src': path.resolve(__dirname, 'src/esm')
+    }
+  },
   build: {
     lib: {
-      entry: 'src/esm/StorageUtils.js',
+      entry: 'src/esm/index.jsx',
       name: 'KeychainBridge',
       formats: ['es'],
       fileName: (format) => `keychain-bridge.${format}.js`
     },
     rollupOptions: {
-      // Make sure to externalize deps that shouldn't be bundled into your library
-      external: ['capacitor-secure-storage-plugin'],
-      output: {
-        globals: {
-          'capacitor-secure-storage-plugin': 'SecureStoragePlugin'
-        }
-      }
+      // Externalize capacitor so it doesn't try to bundle native bridge
+      external: ['capacitor-secure-storage-plugin']
     }
   }
 });

@@ -1,4 +1,4 @@
-import { Crypto } from "./CryptoUtils.js";
+import { Crypto  } from "KEYCHAIN BRIDGE/src/utils/CryptoUtils.js";
 
 // --- Providers Inline ---
 
@@ -176,4 +176,4 @@ const Storage = {
     delete: async (id) => await activeProvider.deleteSecret(id)
 };
 
-export { Storage  };
+export { Storage };

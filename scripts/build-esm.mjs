@@ -1,29 +1,88 @@
 import fs from 'fs';
 import path from 'path';
 
-const SRC_DIR = 'src/utils';
+const SRC_DIR = 'src';
 const DEST_DIR = 'src/esm';
 
-if (!fs.existsSync(DEST_DIR)) {
-    fs.mkdirSync(DEST_DIR, { recursive: true });
+function ensureDir(dir) {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-function processDatacoreToEsm(filePath, destPath) {
+function processDirectory(currentDir) {
+    const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+    
+    for (const entry of entries) {
+        // Skip the esm generation folder itself to avoid infinite loops
+        if (entry.name === 'esm') continue;
+        
+        const fullPath = path.join(currentDir, entry.name);
+        if (entry.isDirectory()) {
+            processDirectory(fullPath);
+        } else if (entry.isFile() && (fullPath.endsWith('.js') || fullPath.endsWith('.jsx'))) {
+            transformFile(fullPath);
+        }
+    }
+}
+
+function transformFile(filePath) {
     let code = fs.readFileSync(filePath, 'utf8');
 
-    // Replace dc.require for CryptoUtils specifically
-    code = code.replace(/const\s+\{\s*Crypto\s*\}\s*=\s*dc\.require[^;]+;/g, 'import { Crypto } from "./CryptoUtils.js";');
+    // 1. Convert `dc.require(dc.resolvePath("..."))` to `import`
+    code = code.replace(/const\s+\{\s*([^}]+)\s*\}\s*=\s*(?:await\s+)?dc\.require\(dc\.resolvePath\(["']([^"']+)["']\)\);/g, 'import { $1 } from "$2";');
+    
+    // 2. Convert `return { X };` to `export { X };`
+    // Handle aliases like `return { KeychainBridge: KeychainBridgeApp };` -> `export { KeychainBridgeApp as KeychainBridge };`
+    code = code.replace(/^return\s+\{\s*([^}]+)\s*\};?\s*$/m, (match, p1) => {
+        const exports = p1.split(',').map(item => {
+            const parts = item.split(':').map(s => s.trim());
+            return parts.length === 2 ? `${parts[1]} as ${parts[0]}` : parts[0];
+        }).join(', ');
+        return `export { ${exports} };`;
+    });
 
-    // 2. Replace Datacore return object with ES6 export
-    // Matches: return { Storage };
-    // Output: export { Storage };
-    code = code.replace(/^return\s+\{\s*([^}]+)\s*\};?\s*$/m, 'export { $1 };');
-
+    // Calculate dest path
+    const relativePath = path.relative(SRC_DIR, filePath);
+    const destPath = path.join(DEST_DIR, relativePath);
+    ensureDir(path.dirname(destPath));
+    
     fs.writeFileSync(destPath, code);
-    console.log(`[Bridge] Transformed ${path.basename(filePath)} -> ESM`);
+    console.log(`[Bridge] Transformed ${relativePath}`);
 }
 
-processDatacoreToEsm(path.join(SRC_DIR, 'CryptoUtils.js'), path.join(DEST_DIR, 'CryptoUtils.js'));
-processDatacoreToEsm(path.join(SRC_DIR, 'StorageUtils.js'), path.join(DEST_DIR, 'StorageUtils.js'));
+// 1. Clean and recreate dest dir
+if (fs.existsSync(DEST_DIR)) {
+    fs.rmSync(DEST_DIR, { recursive: true, force: true });
+}
+ensureDir(DEST_DIR);
 
+// 2. Process all files
+processDirectory(SRC_DIR);
+
+// 3. Generate the Sovereign Inspector WASM/ESM Entrypoint
+const entrypointPath = path.join(DEST_DIR, 'index.jsx');
+const entrypointCode = `
+import { KeychainBridge } from "KEYCHAIN BRIDGE/src/App.jsx";
+
+export function mount_app(container, dc) {
+    // Inject React and ReactDOM into global scope if missing (for preact/compat)
+    if (!window.React) window.React = dc.preact;
+    if (!window.ReactDOM) window.ReactDOM = dc.preact;
+
+    const { h, render } = dc.preact;
+    
+    // Render the App into the container
+    render(h(KeychainBridge, { 
+        folderPath: "KEYCHAIN BRIDGE", 
+        isFullTab: true, 
+        dc 
+    }), container);
+
+    // Return a cleanup function for when the plugin is unloaded
+    return () => {
+        render(null, container);
+    };
+}
+`;
+fs.writeFileSync(entrypointPath, entrypointCode);
+console.log(`[Bridge] Generated Entrypoint: src/esm/index.jsx`);
 console.log('[Bridge] ESM Generation Complete.');
