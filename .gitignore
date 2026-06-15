@@ -6,9 +6,6 @@ data/handshake.enc
 data/bridge-history.json
 data/archives/
 node_modules/
-dist/
-
-# Cache
 .cache/
 *.cache
 .eslintcache

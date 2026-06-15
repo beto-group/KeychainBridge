@@ -1,4 +1,4 @@
-const Crypto = {
+export const CryptoUtils = {
     deriveKey: async (passphrase, salt) => {
         const enc = new TextEncoder();
         const keyMaterial = await window.crypto.subtle.importKey(
@@ -52,5 +52,3 @@ const Crypto = {
         }
     }
 };
-
-return { Crypto };
