@@ -1,4 +1,5 @@
 const dc = window.dc || window.datacore;
+const { h, Fragment } = dc.preact;
 
 function ControlsMenu({ onReload, onToggle, styles, isFullTab }) {
     const theme = styles.theme;

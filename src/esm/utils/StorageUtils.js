@@ -1,4 +1,5 @@
 const dc = window.dc || window.datacore;
+const { h, Fragment } = dc.preact;
 
 import { Crypto  } from "KEYCHAIN BRIDGE/src/utils/CryptoUtils.js";
 

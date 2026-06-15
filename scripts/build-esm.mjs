@@ -40,8 +40,11 @@ function transformFile(filePath) {
         return `export { ${exports} };`;
     });
 
-    // 3. Inject global Datacore Context Bridge
-    code = `const dc = window.dc || window.datacore;\n\n${code}`;
+    // 3. Strip out any existing manual destructurings to prevent SyntaxErrors
+    code = code.replace(/const\s+\{\s*h\s*,\s*Fragment\s*\}\s*=\s*dc\.preact\s*;/g, '');
+
+    // 4. Inject global Datacore Context Bridge and Preact factory functions
+    code = `const dc = window.dc || window.datacore;\nconst { h, Fragment } = dc.preact;\n\n${code}`;
 
     // Calculate dest path
     const relativePath = path.relative(SRC_DIR, filePath);

@@ -1,7 +1,8 @@
 const dc = window.dc || window.datacore;
+const { h, Fragment } = dc.preact;
 
 const { useState, useEffect, useRef } = dc;
-const { h, Fragment } = dc.preact;
+
 
 
 // Load subcomponents & helpers

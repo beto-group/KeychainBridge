@@ -1,4 +1,5 @@
 const dc = window.dc || window.datacore;
+const { h, Fragment } = dc.preact;
 
 function getStyles() {
     // Standard Obsidian CSS Variables for maximum flexibility

@@ -1,4 +1,5 @@
 const dc = window.dc || window.datacore;
+const { h, Fragment } = dc.preact;
 
 const Crypto = {
     deriveKey: async (passphrase, salt) => {
